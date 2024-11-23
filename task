@@ -1,0 +1,100 @@
+using System;
+using System.Collections.Generic;
+
+namespace sys
+{
+    class Program
+    {
+        class Worker
+        {
+            public string Name { get; set; }
+            public int Experience { get; set; }
+            public string Position { get; set; }
+            public double BaseSalary { get; set; }
+            public double BonusSalary { get; private set; }
+
+            public Worker(string name, int experience, string position, double baseSalary)
+            {
+                this.Name = name;
+                this.Experience = experience;
+                this.Position = position;
+                this.BaseSalary = baseSalary;
+            }
+
+            public virtual double CalculateSalary()
+            {
+                BonusSalary = BaseSalary;
+
+                if (this is Manager)
+                {
+                    BonusSalary += Experience * 0.10 * BaseSalary;
+                }
+                else if (this is Director)
+                {
+                    BonusSalary += 0.20 * BaseSalary;
+                }
+                else
+                {
+                    BonusSalary += Experience * 0.05 * BaseSalary;
+                }
+
+                return BonusSalary;
+            }
+
+            public virtual void Info()
+            {
+                Console.WriteLine($"[Worker] Name: {Name}, Experience: {Experience} years, Position: {Position}, Total Salary: {CalculateSalary()} dollars");
+            }
+        }
+
+        class Manager : Worker
+        {
+            public Manager(string name, int experience, string position, double baseSalary)
+                : base(name, experience, position, baseSalary) { }
+
+            public override void Info()
+            {
+                Console.WriteLine($"[Manager] Name: {Name}, Experience: {Experience} years, Position: {Position}, Total Salary: {CalculateSalary()} dollars");
+            }
+        }
+
+        class Director : Worker
+        {
+            public Director(string name, int experience, string position, double baseSalary)
+                : base(name, experience, position, baseSalary) { }
+
+            public override void Info()
+            {
+                Console.WriteLine($"[Director] Name: {Name}, Experience: {Experience} years, Position: {Position}, Total Salary: {CalculateSalary()} dollars");
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            Worker myWorker = new Worker("Dark Elf", 5, "Regular Worker", 10500);
+            Manager myManager = new Manager("Dwarf", 8, "Experienced Manager", 15700);
+            Director myDirector = new Director("Boss", 15, "Wise Director", 50000);
+
+            Console.WriteLine("------------- MY BASE INFO -------------\n");
+            myWorker.Info();
+            myManager.Info();
+            myDirector.Info();
+
+            Console.WriteLine("\n\n------------- MY LIST OF WORKERS -------------\n");
+            List<Worker> workers = new List<Worker> { myWorker, myManager, myDirector };
+
+            foreach (Worker worker in workers)
+            {
+                worker.Info();
+            }
+
+            Console.WriteLine("\n\n------------- TOTAL COMPANY SALARY EXPENSES -------------\n");
+            double totalSalary = 0;
+            foreach (Worker worker in workers)
+            {
+                totalSalary += worker.CalculateSalary();
+            }
+            Console.WriteLine($"Total Company Salary Expenses: {totalSalary} dollars");
+        }
+    }
+}
